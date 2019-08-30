@@ -1,3 +1,5 @@
 *.cmp
 *.out
 *.tst
+tools
+*.pdf
