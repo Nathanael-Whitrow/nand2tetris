@@ -2,6 +2,9 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/02/HalfAdder.hdl
+// Solution by Nathanael Whitrow (n8)
+// 31/08/2019
+
 
 /**
  * Computes the sum of two bits.
@@ -13,7 +16,6 @@ CHIP HalfAdder {
         carry;  // Left bit of a + b
 
     PARTS:
-    // Put you code here:
     Xor(a=a, b=b, out=sum);
     And(a=a, b=b, out=carry);
 }

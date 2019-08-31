@@ -2,6 +2,9 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/01/Mux8Way16.hdl
+// Solution by Nathanael Whitrow (n8)
+// 31/08/2019
+
 
 /**
  * 8-way 16-bit multiplexor:
@@ -18,7 +21,6 @@ CHIP Mux8Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
     Mux4Way16(a=a, b=b, c=c, d=d, sel=sel[0..1], out=mid1);
     Mux4Way16(a=e, b=f, c=g, d=h, sel=sel[0..1], out=mid2);
     Mux16(a=mid1, b=mid2, sel=sel[2], out=out);

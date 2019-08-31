@@ -2,6 +2,9 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/02/FullAdder.hdl
+// Solution by Nathanael Whitrow (n8)
+// 31/08/2019
+
 
 /**
  * Computes the sum of three bits.
@@ -13,7 +16,6 @@ CHIP FullAdder {
         carry;   // Left bit of a + b + c
 
     PARTS:
-    // Put you code here:
     HalfAdder(a=a, b=b, sum=sum1, carry=c1);
     HalfAdder(a=c, b=sum1, sum=sum, carry=c2);
     Or(a=c1, b=c2, out=carry);

@@ -2,6 +2,8 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/05/CPU.hdl
+// Solution by Nathanael Whitrow (n8)
+// 31/08/2019
 
 /**
  * The Hack CPU (Central Processing unit), consisting of an ALU,
@@ -39,8 +41,57 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
+// A register load logic:
+
+    // Load A register if A instruction OR d1 for C instruction
+    Not(in = instruction[15], out = notBit1); 
+    Or(a = notBit1, b = instruction[5], out = aRegisterLoad);
     
+    // This Mux chooses between loading constant into A and ALU output into A
+    // bit 15 output is always false as it's never used, and this makes other things easier
+    Mux16(a[15] = false, a[0..14] = instruction[0..14], b = aluOut, sel = instruction[15], out = aRegisterIn);
+    
+    // Thanks to the above this is self-explanatory
+    ARegister(in = aRegisterIn, load = aRegisterLoad, out = aRegisterOut, out[0..14] = addressM);
+
+// Everything else logic
+    
+    // A or M into ALU
+    Mux16(a = aRegisterOut, b = inM, sel = instruction[12], out = aluInputY);
+
+    // D register
+    And(a = instruction[4], b = instruction[15], out = loadD);
+    DRegister(in = aluOut, load = loadD, out = dRegisterOut);
+
+    // ALU
+    ALU(x = dRegisterOut, y = aluInputY,
+        zx = instruction[11], nx = instruction[10], zy = instruction[9], ny = instruction[8], f = instruction[7], no = instruction[6],
+        out = aluOut, out = outM, zr = eq, ng = lt);
+
+    // Write to memory
+    And(a = instruction[15], b = instruction[3], out = writeM);
 
 
-    
+// Logic for jump control
+
+    // Create a > 0 pin:
+    Or(a = lt, b = eq, out = lte);
+    Not(in = lte, out = gt);
+
+    // Now combine j1, j2, j3 with ALU outputs
+    And(a = instruction[0], b = gt, out = jgt);         // jump if > 0
+    And(a = instruction[1], b = eq, out = jeq);         // jump if = 0
+    And(a = instruction[2], b = lt, out = jlt);         // jump if < 0
+
+    // combine jump conditions to 1 bit
+    Or(a = jgt, b = jeq, out = jge);
+    Or(a = jge, b = jlt, out = jmp);
+
+    // Only jump if C and jmp
+    And(a = jmp, b = instruction[15], out = loadPC);
+
+    // If we're not jumping, we're incrememting!
+    Not(in = loadPC, out = pcIncrement);
+
+    PC(in = aRegisterOut, load = loadPC, inc = pcIncrement, reset = reset, out[0..14] = pc);    
 }

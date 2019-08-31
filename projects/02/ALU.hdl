@@ -2,6 +2,9 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/02/ALU.hdl
+// Solution by Nathanael Whitrow (n8)
+// 31/08/2019
+
 
 /**
  * The ALU (Arithmetic Logic Unit).
@@ -42,24 +45,24 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // phase 1: zeroes
-   Mux16(a=x, b=false, sel=zx, out=zxout);
-   Mux16(a=y, b=false, sel=zy, out=zyout);
+    // phase 1: zeroes
+    Mux16(a=x, b=false, sel=zx, out=zxout);
+    Mux16(a=y, b=false, sel=zy, out=zyout);
 
-   // phase 2: not inputs
-   Not16(in=zxout, out=notx);
-   Not16(in=zyout, out=noty);
-   Mux16(a=zxout, b=notx, sel=nx, out=nxout);
-   Mux16(a=zyout, b=noty, sel=ny, out=nyout);
+    // phase 2: not inputs
+    Not16(in=zxout, out=notx);
+    Not16(in=zyout, out=noty);
+    Mux16(a=zxout, b=notx, sel=nx, out=nxout);
+    Mux16(a=zyout, b=noty, sel=ny, out=nyout);
 
-   // phase 3: function:
-   Add16(a=nxout, b=nyout, out=adderout);
-   And16(a=nxout, b=nyout, out=xANDy);
-   Mux16(a=xANDy, b=adderout, sel=f, out=fout);
+    // phase 3: function:
+    Add16(a=nxout, b=nyout, out=adderout);
+    And16(a=nxout, b=nyout, out=xANDy);
+    Mux16(a=xANDy, b=adderout, sel=f, out=fout);
 
-   // phase 4: notOutput
-   Not16(in=fout, out=notfout);
-   Mux16(a=fout, b=notfout, sel=no, out[15]=ng,
+    // phase 4: notOutput
+    Not16(in=fout, out=notfout);
+    Mux16(a=fout, b=notfout, sel=no, out[15]=ng,
         out[0]=zr0,
         out[1]=zr1,
         out[2]=zr2,
