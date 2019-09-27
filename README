@@ -1,6 +1,7 @@
 28/8/19
 My solutions to nand2tetris!
-I think it's prudent to not include all the test scripts in the repo,
-only the actual code files that are needed.
-If you want to use/run my solutions you need to get the rest of the files
-from nand2tetris.org.
+This is a well known project, and the only parts of it that are
+my work are these solutions. Therefore I have only included my solutions
+in this repo.
+If you don't already have the arest of the files,
+they are readily available at: nand2tetris.org.
