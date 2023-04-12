@@ -1,6 +1,3 @@
-#ifndef ASSEMBLE_CPP
-#define ASSEMBLE_CPP
-
 #include "code.hpp"
 #include "commandTypes.hpp"
 #include "parser.hpp"
@@ -143,5 +140,3 @@ int main(int argc, char* argv[])
 		code.putLine(command);
 	}
 }
-
-#endif
