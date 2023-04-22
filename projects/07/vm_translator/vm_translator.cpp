@@ -2,29 +2,19 @@
 // A virtual machine translator
 // by Nathanael Whitrow
 
+#include "command.hpp"
+#include "commandTypes.hpp"
+#include "parser.hpp"
+
 #include <iostream>
 #include <filesystem>
 
-int main(const int argc, const char *argv[])
+std::vector<std::filesystem::path> getFiles(std::string arg)
 {
-	std::cout << "IR_asm translator online." << std::endl;
-
-	// Accept one command line parameter
-	// --> VMTranslator.out source
-	// where source is either:
-	//	a file name of the form Xxx.vm
-	//	a directory name containing one or more .vm files
-	if (argc != 2)
-	{
-		std::cout << "IR_asm takes one parameter: a target file or directory" << std::endl;
-		return 0;
-	}
-
-	// Vector for holding all .vm files
-	std::vector<std::filesystem::path> file_list;
-
 	// Assume we have a path
-	auto path = std::filesystem::path(argv[1]);
+	auto path = std::filesystem::path(arg);
+
+	std::vector<std::filesystem::path> file_list;
 
 	// Search whole directory for .vm
 	if (std::filesystem::is_directory(path))
@@ -34,12 +24,6 @@ int main(const int argc, const char *argv[])
 			if (dir_entry.path().has_extension())
 				if (dir_entry.path().extension() == ".vm")
 					file_list.push_back(dir_entry.path());
-
-		if (file_list.empty())
-		{
-			std::cout << "No .vm files found. Exiting." << std::endl;
-			return 0;
-		}
 	}
 	// check for single file
 	else if (path.has_extension() && path.extension() == ".vm")
@@ -50,10 +34,76 @@ int main(const int argc, const char *argv[])
 	{
 		std::cout << "Bad argument: please provide vm file or directory containing vm file" << std::endl;
 	}
+	return file_list;
+}
 
-	// After parsing input, should have a vector of .vm files for translating
+// MAIN BABY!!!
+int main(const int argc, const char *argv[])
+{
+	std::cout << "IR_asm translator online." << std::endl;
+
+	if (argc != 2)
+	{
+		std::cout << "IR_asm takes one parameter: a target file or directory" << std::endl;
+		return 0;
+	}
+
+	// Vector for holding all .vm files
+	std::vector<std::filesystem::path> file_list = getFiles(argv[1]);
+
+	if (file_list.empty())
+	{
+		std::cout << "No .vm files found. Exiting." << std::endl;
+		return 0;
+	}
+
+	// After parsing command line parameter,
+	// should have a vector of .vm files for translating
 	for (auto const &vm_file : file_list)
 		std::cout << vm_file << std::endl;
+
+	// Construct parser and code generator
+	Parser parser(file_list.front()); // just deal with one file for now
+	Command command;
+
+	// Clean each line of input file
+	// Add real commands to instruction vector
+	std::vector<std::string> commandList;
+
+	while (parser.hasMoreCommands())
+	{
+		command.clear();
+		command.setLine(parser.advance());
+
+		if (parser.isCommand(command.getLine()))
+		{
+			command.setCommandType(parser.commandType(command.getLine()));
+			command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+
+			switch (command.getCommandType())
+			{
+			case C_ARITHMETIC:
+				commandList.push_back("C_ARITHMETIC " + command.getArg1());
+				break;
+			case C_PUSH:
+				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_PUSH " + command.getArg1() + " " + command.getArg2());
+				break;
+			case ERROR:
+				std::cout << "No valid command found - check vm file" << std::endl;
+				return 0;
+			default:
+				std::cout << "default - no command recognised. Stopping." << std::endl;
+				return 0;
+			}
+		}
+	}
+
+	// print the command list.
+	std::cout << std::endl;
+	for (const auto it : commandList)
+		std::cout << it << std::endl;
+	std::cout << std::endl;
 
 	// Result of running this program will always be a single .asm file
 	return 0;
