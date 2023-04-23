@@ -13,7 +13,7 @@ public:
   ~CodeWriter();
 
   void setFileName(std::filesystem::path);
-  void writeArithmetic(std::string);
+  void writeArithmetic(std::string, uint);
   void writePushPop(commandTypes, std::string segment, std::string index);
   void close();
 

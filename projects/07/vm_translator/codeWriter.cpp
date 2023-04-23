@@ -1,8 +1,12 @@
 #include "codeWriter.hpp"
 
+#include <iostream>
+#include <string>
+
 // Constructor - open the output file for writing
 CodeWriter::CodeWriter(std::filesystem::path asmFile)
 {
+  std::cout << "output file: " << asmFile << std::endl;
   fileWriter.open(asmFile, std::fstream::out);
   // preamble and setup here?
 }
@@ -18,8 +22,9 @@ void CodeWriter::setFileName(std::filesystem::path path)
 }
 
 // Writes assembly for given arithmetic command
-void CodeWriter::writeArithmetic(std::string command)
+void CodeWriter::writeArithmetic(std::string command, uint unique_label_count)
 {
+  auto unique_label = std::to_string(unique_label_count);
   if (command == "add")
   {
     fileWriter << "  @SP" << std::endl;
@@ -42,31 +47,31 @@ void CodeWriter::writeArithmetic(std::string command)
   }
   else if (command == "neg")
   {
-    fileWriter << "@SP" << std::endl;
-    fileWriter << "A=M-1" << std::endl;
-    fileWriter << "D=!M" << std::endl;
-    fileWriter << "M=D+1" << std::endl;
+    fileWriter << "  @SP" << std::endl;
+    fileWriter << "  A=M-1" << std::endl;
+    fileWriter << "  D=!M" << std::endl;
+    fileWriter << "  M=D+1" << std::endl;
   }
   else if (command == "eq")
   {
-    fileWriter << " @SP" << std::endl;
-    fileWriter << " M=M-1" << std::endl;
-    fileWriter << " A=M" << std::endl;
-    fileWriter << " D=M" << std::endl;
-    fileWriter << " A=A-1" << std::endl;
-    fileWriter << " D=D-M" << std::endl;
-    fileWriter << "  @TRUE" << std::endl;
+    fileWriter << "  @SP" << std::endl;
+    fileWriter << "  M=M-1" << std::endl;
+    fileWriter << "  A=M" << std::endl;
+    fileWriter << "  D=M" << std::endl;
+    fileWriter << "  A=A-1" << std::endl;
+    fileWriter << "  D=D-M" << std::endl;
+    fileWriter << "  @TRUE" << unique_label << std::endl;
     fileWriter << "  D;JEQ" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=0" << std::endl;
-    fileWriter << "  @END" << std::endl;
+    fileWriter << "  @END" << unique_label << std::endl;
     fileWriter << "  0;JMP" << std::endl;
-    fileWriter << "(TRUE)" << std::endl;
+    fileWriter << "(TRUE" << unique_label << ")" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=-1" << std::endl;
-    fileWriter << "(END)" << std::endl;
+    fileWriter << "(END" << unique_label << ")" << std::endl;
   }
   else if (command == "gt")
   {
@@ -76,18 +81,18 @@ void CodeWriter::writeArithmetic(std::string command)
     fileWriter << "  D=M" << std::endl;
     fileWriter << "  A=A-1" << std::endl;
     fileWriter << "  D=M-D" << std::endl;
-    fileWriter << "  @TRUE" << std::endl;
+    fileWriter << "  @TRUE" << unique_label << std::endl;
     fileWriter << "  D;JGT" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=0" << std::endl;
-    fileWriter << "  @END" << std::endl;
+    fileWriter << "  @END" << unique_label << std::endl;
     fileWriter << "  0;JMP" << std::endl;
-    fileWriter << "(TRUE)" << std::endl;
+    fileWriter << "(TRUE" << unique_label << ")" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=-1" << std::endl;
-    fileWriter << "(END)" << std::endl;
+    fileWriter << "(END" << unique_label << ")" << std::endl;
   }
   else if (command == "lt")
   {
@@ -97,18 +102,18 @@ void CodeWriter::writeArithmetic(std::string command)
     fileWriter << "  D=M" << std::endl;
     fileWriter << "  A=A-1" << std::endl;
     fileWriter << "  D=M-D" << std::endl;
-    fileWriter << "  @TRUE" << std::endl;
+    fileWriter << "  @TRUE" << unique_label << std::endl;
     fileWriter << "  D;JLT" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=0" << std::endl;
-    fileWriter << "  @END" << std::endl;
+    fileWriter << "  @END" << unique_label << std::endl;
     fileWriter << "  0;JMP" << std::endl;
-    fileWriter << "(TRUE)" << std::endl;
+    fileWriter << "(TRUE" << unique_label << ")" << std::endl;
     fileWriter << "  @SP" << std::endl;
     fileWriter << "  A=M-1" << std::endl;
     fileWriter << "  M=-1" << std::endl;
-    fileWriter << "(END)" << std::endl;
+    fileWriter << "(END" << unique_label << ")" << std::endl;
   }
   else if (command == "and")
   {

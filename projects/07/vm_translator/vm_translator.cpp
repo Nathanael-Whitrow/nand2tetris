@@ -74,8 +74,13 @@ int main(const int argc, const char *argv[])
 	// Add real commands to instruction vector
 	std::vector<std::string> commandList;
 
+	// Counter for unique labelling
+	uint unique_label_count = 0;
+
 	while (parser.hasMoreCommands())
 	{
+		// Doesn't matter if we skip a few numbers, as long as we're unique.
+		unique_label_count++;
 		command.clear();
 		command.setLine(parser.advance());
 
@@ -88,7 +93,7 @@ int main(const int argc, const char *argv[])
 			{
 			case C_ARITHMETIC:
 				commandList.push_back("C_ARITHMETIC " + command.getArg1());
-				writer.writeArithmetic(command.getArg1());
+				writer.writeArithmetic(command.getArg1(), unique_label_count);
 				break;
 			case C_PUSH:
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
