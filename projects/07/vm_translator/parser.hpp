@@ -3,7 +3,6 @@
 
 #define NUM_ARITHMETIC_COMMANDS 9
 
-#include "command.hpp"
 #include "commandTypes.hpp"
 
 #include <filesystem>
