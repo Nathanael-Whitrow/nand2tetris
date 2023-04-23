@@ -2,6 +2,7 @@
 // A virtual machine translator
 // by Nathanael Whitrow
 
+#include "codeWriter.hpp"
 #include "command.hpp"
 #include "commandTypes.hpp"
 #include "parser.hpp"
@@ -40,7 +41,7 @@ std::vector<std::filesystem::path> getFiles(std::string arg)
 // MAIN BABY!!!
 int main(const int argc, const char *argv[])
 {
-	std::cout << "IR_asm translator online." << std::endl;
+	std::cout << "IR to assembly translator online." << std::endl;
 
 	if (argc != 2)
 	{
@@ -64,6 +65,7 @@ int main(const int argc, const char *argv[])
 
 	// Construct parser and code generator
 	Parser parser(file_list.front()); // just deal with one file for now
+	CodeWriter writer(std::filesystem::path("output.asm"));
 	Command command;
 
 	// Clean each line of input file
@@ -84,10 +86,12 @@ int main(const int argc, const char *argv[])
 			{
 			case C_ARITHMETIC:
 				commandList.push_back("C_ARITHMETIC " + command.getArg1());
+				writer.writeArithmetic(command.getArg1());
 				break;
 			case C_PUSH:
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_PUSH " + command.getArg1() + " " + command.getArg2());
+				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
 				break;
 			case ERROR:
 				std::cout << "No valid command found - check vm file" << std::endl;
