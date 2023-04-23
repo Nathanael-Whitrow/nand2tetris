@@ -60,8 +60,10 @@ int main(const int argc, const char *argv[])
 
 	// After parsing command line parameter,
 	// should have a vector of .vm files for translating
+	std::cout << "files list: " << std::endl;
 	for (auto const &vm_file : file_list)
 		std::cout << vm_file << std::endl;
+	std::cout << "end of list" << std::endl;
 
 	// Construct parser and code generator
 	Parser parser(file_list.front()); // just deal with one file for now
