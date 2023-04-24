@@ -112,6 +112,10 @@ commandTypes Parser::commandType(std::string line)
   if (tokens[0] == "push")
     return C_PUSH;
 
+  // Look for POP command
+  else if (tokens[0] == "pop")
+    return C_POP;
+
   // No valid command found
   return ERROR;
 }
@@ -124,26 +128,15 @@ std::string Parser::arg1(std::string line, commandTypes type)
       std::sregex_token_iterator{begin(line), end(line), re, -1},
       std::sregex_token_iterator{});
 
-  std::array<std::string, NUM_ARITHMETIC_COMMANDS> arithmeticCommands{
-      "add",
-      "sub",
-      "neg",
-      "eq",
-      "gt",
-      "lt",
-      "and",
-      "or",
-      "not"};
-
   switch (type)
   {
   case C_ARITHMETIC:
-    // There is only one word in the command, make sure it matches
     return tokens[0];
 
   case C_PUSH:
-    // 'push segment index'
-    // Get 'segment'
+    return tokens[1];
+
+  case C_POP:
     return tokens[1];
 
   default:
@@ -164,6 +157,8 @@ std::string Parser::arg2(std::string line, commandTypes type)
   switch (type)
   {
   case C_PUSH:
+    return tokens[2];
+  case C_POP:
     return tokens[2];
 
   default:

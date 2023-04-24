@@ -77,6 +77,7 @@ int main(const int argc, const char *argv[])
 	// Counter for unique labelling
 	uint unique_label_count = 0;
 
+	// Loops through one file
 	while (parser.hasMoreCommands())
 	{
 		// Doesn't matter if we skip a few numbers, as long as we're unique.
@@ -98,6 +99,11 @@ int main(const int argc, const char *argv[])
 			case C_PUSH:
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_PUSH " + command.getArg1() + " " + command.getArg2());
+				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
+				break;
+			case C_POP:
+				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_POP " + command.getArg1() + " " + command.getArg2());
 				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
 				break;
 			case ERROR:

@@ -24,6 +24,7 @@ void CodeWriter::setFileName(std::filesystem::path path)
 // Writes assembly for given arithmetic command
 void CodeWriter::writeArithmetic(std::string command, uint unique_label_count)
 {
+  fileWriter << "// C_ARITHMETIC " << command << std::endl;
   auto unique_label = std::to_string(unique_label_count);
   if (command == "add")
   {
@@ -150,16 +151,96 @@ void CodeWriter::writePushPop(commandTypes commandType,
                               std::string segment,
                               std::string index)
 {
+  fileWriter << "// push/pop " << segment << " " << index << std::endl;
+  if (segment == "local")
+    segment = "LCL";
+  else if (segment == "argument")
+    segment = "ARG";
+  else if (segment == "temp")
+    segment = "R5";
+  else if (segment == "pointer")
+    segment = "R3";
+
   if (commandType == C_PUSH)
   {
-    fileWriter << "  @" << index << std::endl;
-    fileWriter << "  D=A" << std::endl;
-    fileWriter << "  @SP" << std::endl;
-    fileWriter << "  A=M" << std::endl;
-    fileWriter << "  M=D" << std::endl;
-    fileWriter << "  D=A+1" << std::endl;
-    fileWriter << "  @SP" << std::endl;
-    fileWriter << "  M=D" << std::endl;
+    if (segment == "constant")
+    {
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=A" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  D=A+1" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
+    else if (segment == "R5" || segment == "R3")
+    {
+      std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=A" << std::endl;
+      fileWriter << "  @" << segment << std::endl;
+      fileWriter << "  A=D+A" << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  D=A+1" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
+    else
+    {
+      std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=A" << std::endl;
+      fileWriter << "  @" << segment << std::endl;
+      fileWriter << "  A=D+M" << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  D=A+1" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
+  }
+  else if (commandType == C_POP)
+  {
+    if (segment == "R5" || segment == "R3")
+    {
+      std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=A" << std::endl;
+      fileWriter << "  @" << segment << std::endl;
+      fileWriter << "  D=A+D" << std::endl;
+      fileWriter << "  @R14" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=M-1" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @R14" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
+    else
+    {
+      std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=A" << std::endl;
+      fileWriter << "  @" << segment << std::endl;
+      fileWriter << "  D=M+D" << std::endl;
+      fileWriter << "  @R14" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=M-1" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @R14" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
   }
   return;
 }
