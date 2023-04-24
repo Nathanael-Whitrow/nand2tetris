@@ -77,6 +77,9 @@ int main(const int argc, const char *argv[])
 	// Counter for unique labelling
 	uint unique_label_count = 0;
 
+	// Set filename for static variables
+	writer.setFileName(file_list.front());
+
 	// Loops through one file
 	while (parser.hasMoreCommands())
 	{

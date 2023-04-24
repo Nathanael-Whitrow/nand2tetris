@@ -19,6 +19,7 @@ public:
 
 private:
   std::fstream fileWriter;
+  std::filesystem::path filename;
 };
 
 #endif

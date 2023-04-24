@@ -18,6 +18,7 @@ CodeWriter::~CodeWriter() { fileWriter.close(); }
 void CodeWriter::setFileName(std::filesystem::path path)
 {
   // I expect this to write some sort of label into the assembly
+  filename = path.replace_extension("");
   return;
 }
 
@@ -189,6 +190,17 @@ void CodeWriter::writePushPop(commandTypes commandType,
       fileWriter << "  @SP" << std::endl;
       fileWriter << "  M=D" << std::endl;
     }
+    else if (segment == "static")
+    {
+      index = filename.string() + "." + index;
+      fileWriter << "  @" << index << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=M+1" << std::endl;
+    }
     else
     {
       std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
@@ -222,6 +234,16 @@ void CodeWriter::writePushPop(commandTypes commandType,
       fileWriter << "  D=M" << std::endl;
       fileWriter << "  @R14" << std::endl;
       fileWriter << "  A=M" << std::endl;
+      fileWriter << "  M=D" << std::endl;
+    }
+    else if (segment == "static")
+    {
+      index = filename.string() + "." + index;
+      fileWriter << "  @SP" << std::endl;
+      fileWriter << "  M=M-1" << std::endl;
+      fileWriter << "  A=M" << std::endl;
+      fileWriter << "  D=M" << std::endl;
+      fileWriter << "  @" << index << std::endl;
       fileWriter << "  M=D" << std::endl;
     }
     else
