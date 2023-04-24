@@ -67,7 +67,7 @@ int main(const int argc, const char *argv[])
 
 	// Construct parser and code generator
 	Parser parser(file_list.front()); // just deal with one file for now
-	CodeWriter writer(std::filesystem::path("output.asm"));
+	CodeWriter writer(file_list.front().replace_extension(".asm"));
 	Command command;
 
 	// Clean each line of input file
