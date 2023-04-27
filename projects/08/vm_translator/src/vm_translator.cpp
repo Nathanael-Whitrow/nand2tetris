@@ -91,23 +91,50 @@ int main(const int argc, const char *argv[])
 		if (parser.isCommand(command.getLine()))
 		{
 			command.setCommandType(parser.commandType(command.getLine()));
-			command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 
 			switch (command.getCommandType())
 			{
 			case C_ARITHMETIC:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_ARITHMETIC " + command.getArg1());
 				writer.writeArithmetic(command.getArg1(), unique_label_count);
 				break;
 			case C_PUSH:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_PUSH " + command.getArg1() + " " + command.getArg2());
 				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
 				break;
 			case C_POP:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_POP " + command.getArg1() + " " + command.getArg2());
 				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
+				break;
+			case C_LABEL:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_LABEL " + command.getArg1());
+				break;
+			case C_GOTO:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_GOTO " + command.getArg1());
+				break;
+			case C_IF:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_IF " + command.getArg1());
+				break;
+			case C_FUNCTION:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_FUNCTION " + command.getArg1() + " " + command.getArg2());
+				break;
+			case C_RETURN:
+				commandList.push_back("C_RETURN");
+				break;
+			case C_CALL:
+				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
+				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
+				commandList.push_back("C_CALL " + command.getArg1() + " " + command.getArg2());
 				break;
 			case ERROR:
 				std::cout << "No valid command found - check vm file" << std::endl;
