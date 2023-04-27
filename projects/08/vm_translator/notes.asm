@@ -298,4 +298,15 @@ pop static x:
 
 
 
+  Now it's time to add subroutine calling and sys.init
+
+  Parser: add the 6 new command types: DONE
+  - C_LABEL
+  - C_GOTO
+  - C_IF
+  - C_FUNCTION
+  - C_RETURN
+  - C_CALL
+
+
   

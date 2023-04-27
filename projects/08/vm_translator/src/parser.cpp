@@ -116,6 +116,30 @@ commandTypes Parser::commandType(std::string line)
   else if (tokens[0] == "pop")
     return C_POP;
 
+  // Look for "label" command
+  else if (tokens[0] == "label")
+    return C_LABEL;
+
+  // Look for "goto label" command
+  else if (tokens[0] == "goto")
+    return C_GOTO;
+
+  // Look for "if-goto label" command
+  else if (tokens[0] == "if-goto")
+    return C_IF;
+
+  // Look for "function f n" command
+  else if (tokens[0] == "function")
+    return C_FUNCTION;
+
+  // Look for "return" command
+  else if (tokens[0] == "return")
+    return C_RETURN;
+
+  // Look for "call f n" command
+  else if (tokens[0] == "call")
+    return C_CALL;
+
   // No valid command found
   return ERROR;
 }
@@ -134,9 +158,12 @@ std::string Parser::arg1(std::string line, commandTypes type)
     return tokens[0];
 
   case C_PUSH:
-    return tokens[1];
-
   case C_POP:
+  case C_LABEL:
+  case C_GOTO:
+  case C_IF:
+  case C_FUNCTION:
+  case C_CALL:
     return tokens[1];
 
   default:
@@ -157,8 +184,9 @@ std::string Parser::arg2(std::string line, commandTypes type)
   switch (type)
   {
   case C_PUSH:
-    return tokens[2];
   case C_POP:
+  case C_FUNCTION:
+  case C_CALL:
     return tokens[2];
 
   default:
