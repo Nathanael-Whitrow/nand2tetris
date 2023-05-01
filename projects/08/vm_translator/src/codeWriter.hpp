@@ -14,7 +14,14 @@ public:
 
   void setFileName(std::filesystem::path);
   void writeArithmetic(std::string, uint);
+  void writeCall(std::string functionName, uint unique_label_count, int numArgs);
+  void writeFunction(std::string functionName, int numLocals);
+  void writeGoTo(std::string label);
+  void writeIf(std::string label);
+  void writeInit();
+  void writeLabel(std::string label);
   void writePushPop(commandTypes, std::string segment, std::string index);
+  void writeReturn();
   void close();
 
 private:

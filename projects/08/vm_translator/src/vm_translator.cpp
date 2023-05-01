@@ -76,6 +76,8 @@ int main(const int argc, const char *argv[])
 
 	// Counter for unique labelling
 	uint unique_label_count = 0;
+	std::string nameSpace = "global";
+	std::string delimiter = "$";
 
 	// Set filename for static variables
 	writer.setFileName(file_list.front());
@@ -99,46 +101,69 @@ int main(const int argc, const char *argv[])
 				commandList.push_back("C_ARITHMETIC " + command.getArg1());
 				writer.writeArithmetic(command.getArg1(), unique_label_count);
 				break;
+
 			case C_PUSH:
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_PUSH " + command.getArg1() + " " + command.getArg2());
 				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
 				break;
+
 			case C_POP:
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_POP " + command.getArg1() + " " + command.getArg2());
 				writer.writePushPop(command.getCommandType(), command.getArg1(), command.getArg2());
 				break;
+
 			case C_LABEL:
+				// Can just hand the function name to the code writer
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
-				commandList.push_back("C_LABEL " + command.getArg1());
+				commandList.push_back("C_LABEL " + nameSpace + delimiter + command.getArg1());
+				writer.writeLabel(nameSpace + delimiter + command.getArg1());
 				break;
+
 			case C_GOTO:
+				// Hand the funciton name to the code writer
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
-				commandList.push_back("C_GOTO " + command.getArg1());
+				commandList.push_back("C_GOTO " + nameSpace + delimiter + command.getArg1());
+				writer.writeGoTo(nameSpace + delimiter + command.getArg1());
 				break;
+
 			case C_IF:
+				// Hand the function name to the code writer
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
-				commandList.push_back("C_IF " + command.getArg1());
+				commandList.push_back("C_IF " + nameSpace + delimiter + command.getArg1());
+				writer.writeIf(nameSpace + delimiter + command.getArg1());
 				break;
+
 			case C_FUNCTION:
+				// Set the function name
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_FUNCTION " + command.getArg1() + " " + command.getArg2());
+				writer.writeFunction(command.getArg1(), std::stoi(command.getArg2()));
+				nameSpace = command.getArg1();
 				break;
+
 			case C_RETURN:
+				// Clear the function name
+				writer.writeReturn();
+				nameSpace = "global";
 				commandList.push_back("C_RETURN");
 				break;
+
 			case C_CALL:
 				command.setArg1(parser.arg1(command.getLine(), command.getCommandType()));
 				command.setArg2(parser.arg2(command.getLine(), command.getCommandType()));
 				commandList.push_back("C_CALL " + command.getArg1() + " " + command.getArg2());
+				writer.writeCall(command.getArg1(), unique_label_count, std::stoi(command.getArg2()));
 				break;
+
 			case ERROR:
 				std::cout << "No valid command found - check vm file" << std::endl;
 				return 0;
+
 			default:
 				std::cout << "default - no command recognised. Stopping." << std::endl;
 				return 0;
