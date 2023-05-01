@@ -24,7 +24,7 @@ std::vector<std::filesystem::path> getFiles(std::string arg)
 		for (auto const &dir_entry : std::filesystem::directory_iterator{path})
 			if (dir_entry.path().has_extension())
 				if (dir_entry.path().extension() == ".vm")
-					file_list.push_back(dir_entry.path());
+					file_list.push_back(dir_entry.path().filename());
 	}
 	// check for single file
 	else if (path.has_extension() && path.extension() == ".vm")
@@ -65,9 +65,10 @@ int main(const int argc, const char *argv[])
 		std::cout << vm_file << std::endl;
 	std::cout << "end of list" << std::endl;
 
-	// Construct parser and code generator
-	Parser parser(file_list.front()); // just deal with one file for now
-	CodeWriter writer(file_list.front().replace_extension(".asm"));
+	// Generate path for output file
+	auto outputFileName = std::filesystem::absolute(file_list.front()).parent_path().stem().replace_extension(".asm");
+
+	CodeWriter writer(outputFileName);
 	Command command;
 
 	// Clean each line of input file
@@ -76,11 +77,14 @@ int main(const int argc, const char *argv[])
 
 	// Counter for unique labelling
 	uint unique_label_count = 0;
-	std::string nameSpace = "global";
+	std::string nameSpace = "sys";
 	std::string delimiter = "$";
 
 	// Set filename for static variables
 	writer.setFileName(file_list.front());
+
+	// Loop here for parsing multiple .vm files
+	Parser parser(file_list.front()); // just deal with one file for now
 
 	// Loops through one file
 	while (parser.hasMoreCommands())
@@ -149,7 +153,7 @@ int main(const int argc, const char *argv[])
 			case C_RETURN:
 				// Clear the function name
 				writer.writeReturn();
-				nameSpace = "global";
+				nameSpace = "sys";
 				commandList.push_back("C_RETURN");
 				break;
 

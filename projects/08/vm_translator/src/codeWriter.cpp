@@ -203,6 +203,7 @@ void CodeWriter::writePushPop(commandTypes commandType,
     }
     else
     {
+      // LCL, ARG, THIS, THAT
       std::transform(segment.begin(), segment.end(), segment.begin(), ::toupper);
       fileWriter << "  @" << index << std::endl;
       fileWriter << "  D=A" << std::endl;
