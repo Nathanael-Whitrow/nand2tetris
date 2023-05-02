@@ -15,10 +15,10 @@ CodeWriter::CodeWriter(std::filesystem::path asmFile)
 CodeWriter::~CodeWriter() { fileWriter.close(); }
 
 // Called when translation of a new file starts
+// Used for name-spacing static variables
 void CodeWriter::setFileName(std::filesystem::path path)
 {
-  // I expect this to write some sort of label into the assembly
-  filename = path.replace_extension("");
+  filename = path.stem();
   return;
 }
 
@@ -152,7 +152,7 @@ void CodeWriter::writePushPop(commandTypes commandType,
                               std::string segment,
                               std::string index)
 {
-  fileWriter << "// push/pop " << segment << " " << index << std::endl;
+  fileWriter << "// push-pop " << segment << " " << index << std::endl;
   if (segment == "local")
     segment = "LCL";
   else if (segment == "argument")
@@ -373,6 +373,18 @@ void CodeWriter::writeIf(std::string label)
 
 void CodeWriter::writeInit()
 {
+  fileWriter << "// Bootstrap" << std::endl;
+  fileWriter << "  @256" << std::endl;
+  fileWriter << "  D=A" << std::endl;
+  fileWriter << "  @SP" << std::endl;
+  fileWriter << "  M=D" << std::endl;
+  writeCall("Sys.init", 0, 0);
+  // fileWriter << "  @LCL" << std::endl;
+  // fileWriter << "  M=D" << std::endl;
+  // fileWriter << "  @ARG" << std::endl;
+  // fileWriter << "  M=D" << std::endl;
+  // fileWriter << "  @Sys.init" << std::endl;
+  // fileWriter << "  0;JMP" << std::endl;
   return;
 }
 
