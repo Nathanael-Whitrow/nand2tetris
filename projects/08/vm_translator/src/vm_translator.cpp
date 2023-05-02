@@ -159,7 +159,6 @@ int main(const int argc, const char *argv[])
 				case C_RETURN:
 					// Clear the function name
 					writer.writeReturn();
-					nameSpace = "sys";
 					commandList.push_back("C_RETURN");
 					break;
 
